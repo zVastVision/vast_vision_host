@@ -1,6 +1,6 @@
 <template>
   <div class="mt-6 mb-4">
-    <WarehouseHeaderWidget>Inventory</WarehouseHeaderWidget>
+    <WarehouseHeaderWidget>Inventory TEST</WarehouseHeaderWidget>
     <div class="flex justify-between">
       <div>
         <SearchInput
