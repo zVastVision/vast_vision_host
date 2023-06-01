@@ -120,9 +120,8 @@
       <button
         class="btn btn--primary mr-5"
         style="background-color: transparent; border-color:white"
-        @click="successModalOpen = !successModalOpen"
       >
-        Close
+        <a :href="`../equipment`">Close</a>
       </button>
     </div>
   </LazyConfirmationModal>

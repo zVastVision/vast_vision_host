@@ -9,7 +9,7 @@
       v-for="(p, index) in itemDetails"
       :key="index"
     >
-    <div class="overlay" v-bind:style='style="--x:" + (parseInt(p.location.split(",")[0]) * 0.7 + parseInt(870)).toString() + "px; --y:" + (parseInt(p.location.split(",")[1]) * 0.35 + parseInt(420)).toString() + "px;"'>
+    <div class="overlay" v-bind:style='style="--x:" + (parseInt(p.location.split(",")[0]) * 0.25 + parseInt(870)).toString() + "px; --y:" + (parseInt(p.location.split(",")[1]) * 0.125 + parseInt(420)).toString() + "px;"'>
       <img src="/images/svg/blue_dot.svg" alt="down">
     </div>
   </li>

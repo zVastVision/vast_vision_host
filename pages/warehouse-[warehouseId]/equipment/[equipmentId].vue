@@ -9,6 +9,13 @@
     <div class="flex justify-end">
       <a
         type="submit"
+        class="btn btn--secondary ml-4 flex"
+        :href="`../equipment`"
+      >
+        Back
+      </a>
+      <a
+        type="submit"
         class="btn btn--primary ml-4 flex"
         :href="`${store.equipmentData?.id}?edit=true`"
       >
@@ -89,6 +96,13 @@
         </p>
       </div>
     </div>
+    <div>"  "</div>
+    <div>
+      <h1 class="font-bold text-white">
+        Live View - {{ store.equipmentData?.name }}
+      </h1>
+    </div>
+    <canvas class="canvas"></canvas>
   </main>
   <form
     v-else
@@ -285,3 +299,21 @@ const onSubmit = validationResult.handleSubmit(values => {
 })
 
 </script>
+
+<style lang="scss" scoped>
+.canvas {
+  position: relative;
+  left: 0px;
+  top: 0px;
+  width: 1180px;
+  height: 630px;
+  background-color: white;
+  opacity: 0.05;
+}
+
+.overlay {
+  position: absolute;
+  left: var(--x, 10px);
+  top: var(--y, 10px);
+}
+</style>

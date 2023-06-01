@@ -109,8 +109,11 @@
         src="/images/svg/lost.svg"
         alt=""
       >
-      <p class="text-vvn-gray-90 text-center text-lg mt-6">
+      <p v-if="searchInput.value == ''" class="text-vvn-gray-90 text-center text-lg mt-6">
         No inventory created
+      </p>
+      <p v-else class="text-vvn-gray-90 text-center text-lg mt-6">
+        No inventory return from search
       </p>
     </div>
   </div>
@@ -393,10 +396,11 @@ const saveEdit = async () => {
 }
 
 const addToEncodingQueue = async () => {
+  //const encodingEmpQueue: Employee[] = useGetLocalStorageJSON(runtimeConfig.encodingEmpQueue) as Employee[]
   const encodingInvQueue: Inventory[] = useGetLocalStorageJSON(runtimeConfig.encodingInvQueue) as Inventory[]
   for (let s = 0; s < data.selected.length; s++) {
-    //const encodingInvQueue: Inventory[] = useGetLocalStorageJSON(runtimeConfig.encodingInvQueue) as Inventory[]
     const exists = encodingInvQueue.find((i: InventoryItem) => i.id === data.selected[s])
+    //const exists = encodingEmpQueue.find((i: Employee) => i.id === data.selected[s].id)
     if (exists) {
       useToast().error("Item already exists in encoding queue")
     } else {

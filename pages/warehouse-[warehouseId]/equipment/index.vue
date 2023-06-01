@@ -4,20 +4,21 @@
     <div class="flex justify-between">
       <div>
         <SearchInput
-          v-show="tableDetails.length != 0"
+          v-show="tableDetails.length != 0 || searchInput.value != ''"
           v-model.trim.lazy="searchInput"
           :show-secondary-icon="true"
           class="w-[19rem] mt-4"
         />
       </div>
       <div class="flex items-end">
+        <div class="relative">
         <button
           class="btn btn--secondary mr-2 flex gap-2"
           :disabled="data.selected.length < 1"
-          @click="actionsDropDownActive=true"
+          @click="actionsDropDownActive = !actionsDropDownActive"
           @blur="closeActionsDropDown"
         >
-          Actions             
+          Actions
           <img
             class="caret"
             :class="{active: actionsDropDownActive}"
@@ -26,23 +27,46 @@
           >
         </button>
         <ul
-          class="actions-dropdown dropdown w-48 bg-vvn-gray text-white text-center rounded-lg absolute z-30 mt-12"
+          v-if="data.selected.length > 1"
+          class="dropdown w-48 bg-vvn-gray text-white text-center rounded-lg absolute z-30 -ml-14 mt-2"
           :class="{ active: actionsDropDownActive }"
         >
           <li
-            class="py-2 w-full"
-            @click="editItem"
+            class="py-2"
           >
-            Edit
+            <button @click="deleteConfirmationModalActive = true">Delete</button>
           </li>
           <hr>
           <li
             class="py-2"
-            @click="deleteConfirmationModalActive = true"
           >
-            Delete
+            <button @click="addToEncodingQueue()">Add to Encoding Queue</button>
           </li>
         </ul>
+        <ul
+          v-else
+          class="actions-dropdown dropdown w-48 bg-vvn-gray text-white text-center rounded-lg absolute z-30 -ml-14 mt-2"
+          :class="{ active: actionsDropDownActive }"
+        >
+          <li
+            class="py-2 w-full"
+          >
+            <a :href="`equipment/${data.selected[0]}?edit=true`">Edit</a>
+          </li>
+          <hr>
+          <li
+            class="py-2"
+          >
+            <button @click="deleteConfirmationModalActive = true">Delete</button>
+          </li>
+          <hr>
+          <li
+            class="py-2"
+          >
+            <button @click="addToEncodingQueue()">Add to Encoding Queue</button>
+          </li>
+        </ul>
+        </div>
         <div class="relative">
           <button
             class="btn btn--primary appearance-none"
@@ -82,9 +106,12 @@
         src="/images/svg/lost.svg"
         alt=""
       >
-      <p class="text-vvn-gray-90 text-center text-lg mt-6">
+      <p v-if="searchInput.value == ''" class="text-vvn-gray-90 text-center text-lg mt-6">
         No equipment created
-      </p>
+      </p>  
+      <p v-else class="text-vvn-gray-90 text-center text-lg mt-6">
+        No equipment return from search
+      </p> 
     </div>
   </div>
   <!-- ================================================ -->
@@ -118,11 +145,22 @@
         </td>
         <td class="flex justify-end">
           <button
+            v-if="true && data.toggledItem != rowData.id"
             class=" mr-11"
-            @click="(data.toggledItem = rowData.id as string)"
+            @click="data.toggledItem = rowData.id"
           >
             <img
               src="/images/svg/caret-down.svg"
+              alt="down"
+            >
+          </button>
+          <button
+            v-else
+            class=" mr-11"
+            @click="data.toggledItem = -1"
+          >
+            <img
+              src="/images/svg/caret-up.svg"
               alt="down"
             >
           </button>
@@ -258,6 +296,8 @@
 <script setup lang="ts">
 import { Inventory } from "~/types"
 
+const runtimeConfig = useRuntimeConfig()
+
 interface State {
   dropdownActive: boolean
   selected: string[]
@@ -284,12 +324,13 @@ const deleteConfirmationModalActive = ref(false)
 const actionsDropDownActive = ref(false)
 
 const tableDetails = computed(() => {
-  //return searchInput.value == "" ? store.inventoryList : store.inventorySearch
-  return store.equipmentList
+  return searchInput.value == "" ? store.equipmentList : store.equipmentSearch
+  //return store.equipmentList
 })
 
 watch(searchInput, async (current) => {
-  store.searchInventoryItem(current, { page: 0, size: 5 })
+  //store.searchInventoryItem(current, { page: 0, size: 5 })
+  store.searchEquipmentItem(current, { page: 0, size: 100 })
 })
 
 await useAsyncData('', () => store.getEquipmentItems({}))
@@ -324,6 +365,28 @@ const saveEdit = async () => {
   })*/
 }
 
+const addToEncodingQueue = async () => {
+  const encodingQueue: Equipment[] = useGetLocalStorageJSON(runtimeConfig.encodingQueue) as Equipment[]
+  for (let s = 0; s < data.selected.length; s++) {
+    //const encodingInvQueue: Inventory[] = useGetLocalStorageJSON(runtimeConfig.encodingInvQueue) as Inventory[]
+    //const exists = encodingInvQueue.find((i: InventoryItem) => i.id === data.selected[s])
+    const exists = encodingQueue.find((i: Equipment) => i.id === data.selected[s])
+    if (exists) {
+      useToast().error("Item already exists in encoding queue")
+    } else {
+      store.getEquipmentItemById(data.selected[s] as string).then(() => {
+        //console.log(store.inventoryData)
+        encodingQueue.push({ ...store.equipmentData, quantity: 1 })
+        //console.log(encodingInvQueue)
+        useSetLocalStorage(runtimeConfig.encodingQueue, encodingQueue)
+        useToast().success("Equipment Added to encoding queue")
+      }).catch(() => {
+        useToast().error('Item not found in database')
+      })
+    }
+  }
+}
+
 const closeActionsDropDown = () => setTimeout((() => actionsDropDownActive.value=false), 100)
 const closeAddNewDropdown = () => setTimeout(() => data.dropdownActive = false, 100)
 </script>
@@ -334,10 +397,10 @@ const closeAddNewDropdown = () => setTimeout(() => data.dropdownActive = false, 
   transition: all 0.3s ease-out;
 
   &.actions-dropdown.active {
-    height: 80px;
+    height: 124px;
   }
   &.active {
-    height: 124px;
+    height: 80px;
   }
 }
 

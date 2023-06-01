@@ -4,7 +4,7 @@
     <div class="flex justify-between">
       <div>
         <SearchInput
-          v-show="tableDetails.length != 0"
+          v-show="tableDetails.length != 0 || searchInput.value != ''"
           v-model.trim.lazy="searchInput"
           :show-secondary-icon="true"
           class="w-[19rem] mt-4"
@@ -106,9 +106,12 @@
         src="/images/svg/lost.svg"
         alt=""
       >
-      <p class="text-vvn-gray-90 text-center text-lg mt-6">
+      <p v-if="searchInput.value == ''" class="text-vvn-gray-90 text-center text-lg mt-6">
         No employees created
       </p>
+      <p v-else class="text-vvn-gray-90 text-center text-lg mt-6">
+        No employees return from search
+      </p> 
     </div>
   </div>
   <!-- ================================================ -->
@@ -293,6 +296,12 @@
 <script setup lang="ts">
 import { Inventory } from "~/types"
 
+/*interface Props {
+  data: Inventory
+}
+const props = defineProps<Props>();*/
+const runtimeConfig = useRuntimeConfig()
+
 interface State {
   dropdownActive: boolean
   selected: string[]
@@ -319,12 +328,13 @@ const deleteConfirmationModalActive = ref(false)
 const actionsDropDownActive = ref(false)
 
 const tableDetails = computed(() => {
-  //return searchInput.value == "" ? store.inventoryList : store.inventorySearch
-  return store.employeeList
+  return searchInput.value == "" ? store.employeeList : store.employeeSearch
+  //return store.employeeList
 })
 
 watch(searchInput, async (current) => {
-  store.searchInventoryItem(current, { page: 0, size: 5 })
+  //store.searchInventoryItem(current, { page: 0, size: 5 })
+  store.searchEmployeeItem(current, { page: 0, size: 100 })
 })
 await useAsyncData('', () => store.getEmployeeItems({}))
 
@@ -359,24 +369,26 @@ const saveEdit = async () => {
 }
 
 const addToEncodingQueue = async () => {
-  /*const encodingInvQueue: Inventory[] = useGetLocalStorageJSON(runtimeConfig.encodingInvQueue) as Inventory[]
+  const encodingEmpQueue: Employee[] = useGetLocalStorageJSON(runtimeConfig.encodingEmpQueue) as Employee[]
+  //const encodingInvQueue: Inventory[] = useGetLocalStorageJSON(runtimeConfig.encodingInvQueue) as Inventory[]
   for (let s = 0; s < data.selected.length; s++) {
     //const encodingInvQueue: Inventory[] = useGetLocalStorageJSON(runtimeConfig.encodingInvQueue) as Inventory[]
-    const exists = encodingInvQueue.find((i: InventoryItem) => i.id === data.selected[s])
+    //const exists = encodingInvQueue.find((i: InventoryItem) => i.id === data.selected[s])
+    const exists = encodingEmpQueue.find((i: Employee) => i.id === data.selected[s])
     if (exists) {
       useToast().error("Item already exists in encoding queue")
     } else {
-      store.getInventoryItemById(data.selected[s] as string).then(() => {
+      store.getEmployeeItemById(data.selected[s] as string).then(() => {
         //console.log(store.inventoryData)
-        encodingInvQueue.push({ ...store.inventoryData, quantity: 1 })
+        encodingEmpQueue.push({ ...store.employeeData, quantity: 1 })
         //console.log(encodingInvQueue)
-        useSetLocalStorage(runtimeConfig.encodingInvQueue, encodingInvQueue)
-        useToast().success("Inventory Added to encoding queue")
+        useSetLocalStorage(runtimeConfig.encodingEmpQueue, encodingEmpQueue)
+        useToast().success("Employee Added to encoding queue")
       }).catch(() => {
         useToast().error('Item not found in database')
       })
     }
-  }*/
+  }
 }
 
 const closeActionsDropDown = () => setTimeout((() => actionsDropDownActive.value=false), 100)

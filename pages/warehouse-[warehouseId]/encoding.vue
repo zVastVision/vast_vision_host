@@ -292,7 +292,7 @@ const pressEq = () => {
   }
   data.encodingList = real_list as Equipment[]
   //console.log(data.encodingList)
-  console.log("EQ pressed")
+  //console.log("EQ pressed")
 }
 
 await useAsyncData('', () => inventoryStore.getInventoryItems({

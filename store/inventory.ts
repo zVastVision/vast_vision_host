@@ -11,6 +11,8 @@ export const useInventoryStore = defineStore('inventory', {
         itemsData: [],
         activeitemsData: [],
         inventorySearch: [],
+        employeeSearch: [],
+        equipmentSearch: [],
         inventoryData: null,
         employeeData: null,
         equipmentData: null,
@@ -200,9 +202,31 @@ export const useInventoryStore = defineStore('inventory', {
                 page: paging.page,
                 limit: paging.size
             })
-
+              
             //this.inventorySearch = await this.mapInventory(inventoryItems)
             this.inventorySearch = await this.mapSearchInventory(query, inventoryItems)
+        },
+
+        async searchEmployeeItem(query: string, paging: Paging): Promise<void> {
+            //const inventoryItems = await DataStore.query(ProductModel, p => p.name.contains(query), {
+            const employeeItems = await DataStore.query(EmployeeModel, Predicates.ALL, {
+                page: paging.page,
+                limit: paging.size
+            })
+
+            //this.inventorySearch = await this.mapInventory(inventoryItems)
+            this.employeeSearch = await this.mapSearchEmployees(query, employeeItems)
+        },
+
+        async searchEquipmentItem(query: string, paging: Paging): Promise<void> {
+            //const inventoryItems = await DataStore.query(ProductModel, p => p.name.contains(query), {
+            const equipmentItems = await DataStore.query(EquipmentModel, Predicates.ALL, {
+                page: paging.page,
+                limit: paging.size
+            })
+
+            //this.inventorySearch = await this.mapInventory(inventoryItems)
+            this.equipmentSearch = await this.mapSearchEquipment(query, equipmentItems)
         },
 
         async mapItems(allItems: LazyItem[]): Promise<InventoryItem[]> {
@@ -309,6 +333,34 @@ export const useInventoryStore = defineStore('inventory', {
             return employeeList
         },
 
+        async mapSearchEmployees(query: string, employeeItems: LazyEmployee[]): Promise<Employee[]> {
+            const employeeList = []
+            console.log("Employee List")
+            console.log(employeeItems)
+            for await (const product of employeeItems) {
+                const prod_name = product.name.split(" ")
+                let search_bool = false
+                for (let h = 0; h < prod_name.length; h++) {
+                    if(prod_name[h].replace(/["'()]/g,"").toLowerCase().startsWith(query.toLowerCase())){
+                        search_bool = true
+                        break
+                    }
+                }
+                if(search_bool == true){
+                    const employeeItem: Employee = {
+                        id: product.id,
+                        name: product.name,
+                        title: product.title,
+                        email: product.email,
+                        phone: product.phone,
+                        extraDetails: product.extraDetails as Record<string, string>[]
+                    }
+                    employeeList.push(employeeItem)
+                }
+            }
+            return employeeList
+        },
+
         async mapEquipment(equipmentItems: LazyEquipment[]): Promise<Equipment[]> {
             const equipmentList = []
             console.log("Equipment List")
@@ -322,6 +374,33 @@ export const useInventoryStore = defineStore('inventory', {
                     extraDetails: product.extraDetails as Record<string, string>[]
                 }
                 equipmentList.push(equipmentItem)
+            }
+            return equipmentList
+        },
+
+        async mapSearchEquipment(query: string, equipmentItems: LazyEquipment[]): Promise<Equipment[]> {
+            const equipmentList = []
+            //console.log("Employee List")
+            //console.log(employeeItems)
+            for await (const product of equipmentItems) {
+                const prod_name = product.name.split(" ")
+                let search_bool = false
+                for (let h = 0; h < prod_name.length; h++) {
+                    if(prod_name[h].replace(/["'()]/g,"").toLowerCase().startsWith(query.toLowerCase())){
+                        search_bool = true
+                        break
+                    }
+                }
+                if(search_bool == true){
+                    const equipmentItem: Equipment = {
+                        id: product.id,
+                        name: product.name,
+                        description: product.description as string,
+                        part_id: product.part_id,
+                        extraDetails: product.extraDetails as Record<string, string>[]
+                    }
+                    equipmentList.push(equipmentItem)
+                }
             }
             return equipmentList
         },

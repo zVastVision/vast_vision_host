@@ -41,7 +41,7 @@
     "jsdom": "^21.1.1",
     "lint-staged": "^13.1.0",
     "node-sass": "^8.0.0",
-    "nuxt": "^3.5.0",
+    "nuxt": "^3.5.2",
     "papaparse": "^5.4.1",
     "path-browserify": "^1.0.1",
     "pinia": "^2.1.2",
@@ -67,6 +67,8 @@
   },
   "dependencies": {
     "mdb-vue-ui-kit": "^4.0.0",
-    "vue": "^3.3.4"
+    "vue": "^3.3.4",
+    "vue-multiselect": "^2.1.7",
+    "vue-simple-search-dropdown": "^1.0.1"
   }
 }
