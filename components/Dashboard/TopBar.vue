@@ -42,15 +42,15 @@
         >
       </button>
       <img
-        src="/images/jpg/profile.jpg"
+        src="/images/jpg/sunrise_office-logo.jpeg"
         alt="profile photo"
         class="rounded-full block h-14 w-14 object-cover ml-5"
       >
       <div class=" ml-3">
         <p class="text-white">
-          Mason
+          Sunrise
         </p>
-        <small class="text-vvn-gray">Mason.martinez@bluehalo.com</small>
+        <small class="text-vvn-gray">matt@sunriseoffice.net</small>
       </div>
     </div>
   </div>
